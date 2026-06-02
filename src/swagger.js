@@ -10,7 +10,7 @@ const options = {
         },
         servers: [
             {
-                url: process.env.BASE_URL || "http://localhost:3000"            }
+                url: process.env.BASE_URL || "https://resqfood-backend.up.railway.app"            }
         ],
         components: {
             securitySchemes: {
