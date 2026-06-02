@@ -25,6 +25,43 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
     }
 }));
 
+app.get('/swagger.json', (req, res) => {
+    res.json(swaggerSpecs);
+});
+
+app.get('/api-docs', (req, res) => {
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ResQFood API Docs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+</head>
+<body>
+<div id="swagger-ui"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+
+<script>
+window.onload = () => {
+  SwaggerUIBundle({
+    url: '/swagger.json',
+    dom_id: '#swagger-ui',
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    layout: "BaseLayout",
+    persistAuthorization: true
+  });
+};
+</script>
+
+</body>
+</html>
+    `);
+});
 
 // =====================
 // ROUTES
