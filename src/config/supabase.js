@@ -7,15 +7,19 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-    console.warn('Missing Supabase credentials (running without Supabase)');
-}
+ilet supabase = null;
 
-// Konfigurasi dengan transport WebSocket manual
-const supabase = createClient(supabaseUrl, supabaseKey, {
-    realtime: {
-        transport: WebSocket,
-    },
-});
+// hanya buat client kalau env ada
+if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey, {
+        realtime: {
+            transport: WebSocket,
+        },
+    });
+
+    console.log("Supabase connected");
+} else {
+    console.warn("Supabase NOT configured, running without Supabase");
+}
 
 module.exports = supabase;
