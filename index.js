@@ -12,8 +12,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api-docs', swaggerUi.serve);
-
 app.get('/api-docs', swaggerUi.setup(swaggerSpecs, {
     explorer: true,
     swaggerOptions: {
