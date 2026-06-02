@@ -12,9 +12,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/swagger.json', (req, res) => {
-    res.json(swaggerSpecs);
-});
+app.use('/api-docs', swaggerUi.serve);
+
+app.get('/api-docs', swaggerUi.setup(swaggerSpecs, {
+    explorer: true,
+    swaggerOptions: {
+        persistAuthorization: true,
+        tagsSorter: 'alpha',
+        operationsSorter: 'alpha'
+    }
+}));
 
 // Routes
 const authRoutes = require('./src/routes/authRoutes');
