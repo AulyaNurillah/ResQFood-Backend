@@ -10,9 +10,7 @@ const options = {
         },
         servers: [
             {
-                url: process.env.BASE_URL || "http://localhost:3000",
-                description: "API Server"
-            }
+                url: process.env.BASE_URL || "http://localhost:3000"            }
         ],
         components: {
             securitySchemes: {

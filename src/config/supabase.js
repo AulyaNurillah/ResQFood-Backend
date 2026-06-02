@@ -7,9 +7,8 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-ilet supabase = null;
+let supabase = null;
 
-// hanya buat client kalau env ada
 if (supabaseUrl && supabaseKey) {
     supabase = createClient(supabaseUrl, supabaseKey, {
         realtime: {
@@ -19,7 +18,7 @@ if (supabaseUrl && supabaseKey) {
 
     console.log("Supabase connected");
 } else {
-    console.warn("Supabase NOT configured, running without Supabase");
+    console.warn("Supabase NOT configured");
 }
 
 module.exports = supabase;
