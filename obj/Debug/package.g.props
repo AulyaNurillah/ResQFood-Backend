@@ -16,7 +16,6 @@
     <PackageJsonDependenciesSwaggerJsdoc Condition="$(PackageJsonDependenciesSwaggerJsdoc) == ''">^6.2.8</PackageJsonDependenciesSwaggerJsdoc>
     <PackageJsonDependenciesSwaggerUiExpress Condition="$(PackageJsonDependenciesSwaggerUiExpress) == ''">^5.0.0</PackageJsonDependenciesSwaggerUiExpress>
     <PackageJsonDependenciesWs Condition="$(PackageJsonDependenciesWs) == ''">^8.21.0</PackageJsonDependenciesWs>
-    <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">^10.4.1</PackageJsonDevdependenciesEslint>
     <PackageJsonDevdependenciesNodemon Condition="$(PackageJsonDevdependenciesNodemon) == ''">^3.0.1</PackageJsonDevdependenciesNodemon>
   </PropertyGroup>
 </Project>
