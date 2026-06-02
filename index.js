@@ -1,8 +1,9 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./src/swagger');
+//const swaggerSpecs = require('./src/swagger');
 
 dotenv.config();
 
@@ -21,7 +22,20 @@ const notificationRoutes = require('./src/routes/notificationRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 
 // Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, { explorer: true }));
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, { explorer: true }));
+// Swagger UI dengan file statis swagger.json
+//const swaggerUi = require('swagger-ui-express');
+
+// Endpoint untuk menyajikan swagger.json
+app.get('/api-docs/swagger.json', (req, res) => {
+    res.sendFile(path.join(__dirname, 'swagger.json'));
+});
+
+// Swagger UI mengarah ke endpoint swagger.json
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, {
+    swaggerUrl: '/api-docs/swagger.json',
+    explorer: true
+}));
 
 // Home
 app.get('/', (req, res) => {

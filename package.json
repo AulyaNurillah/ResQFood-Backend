@@ -21,5 +21,11 @@
   "devDependencies": {
     "eslint": "^10.4.1",
     "nodemon": "^3.0.1"
+  },
+  "scripts": {
+    "build-swagger": "node generate-swagger.js",
+    "build": "npm run build-swagger",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   }
 }
