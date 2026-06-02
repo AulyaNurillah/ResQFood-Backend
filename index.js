@@ -3,9 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./src/swagger');
-app.get('/swagger.json', (req, res) => {
-    res.json(swaggerSpecs);
-});
 
 dotenv.config();
 
@@ -14,6 +11,10 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.get('/swagger.json', (req, res) => {
+    res.json(swaggerSpecs);
+});
 
 // Routes
 const authRoutes = require('./src/routes/authRoutes');
