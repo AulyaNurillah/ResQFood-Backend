@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /api/upload/product-image:
+ * /api/upload/productimage:
  *   post:
  *     summary: Upload product image to Supabase Storage
  *     tags: [Upload]

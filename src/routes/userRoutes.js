@@ -78,7 +78,7 @@ router.delete('/', authMiddleware, deleteUser);
 
 /**
  * @swagger
- * /api/users/register-seller:
+ * /api/users/registerseller:
  *   post:
  *     summary: Register as seller with detailed store information
  *     tags: [User]
@@ -112,7 +112,7 @@ router.post('/registerseller', authMiddleware, registerAsSeller);
 
 /**
  * @swagger
- * /api/users/seller-status:
+ * /api/users/sellerstatus:
  *   get:
  *     summary: Get seller verification status
  *     tags: [User]

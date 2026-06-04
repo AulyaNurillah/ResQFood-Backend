@@ -59,7 +59,7 @@ router.post('/login', login);
 
 /**
  * @swagger
- * /api/auth/forgot-password:
+ * /api/auth/forgotpassword:
  *   post:
  *     summary: Send password reset link to email
  *     tags: [Auth]
@@ -85,7 +85,7 @@ router.post('/forgotpassword', passwordController.forgotPassword);
 
 /**
  * @swagger
- * /api/auth/reset-password:
+ * /api/auth/resetpassword:
  *   post:
  *     summary: Reset password using token
  *     tags: [Auth]
