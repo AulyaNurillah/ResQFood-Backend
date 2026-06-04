@@ -76,8 +76,53 @@ router.post('/upgradetoseller', authMiddleware, upgradeToSeller);
  */
 router.delete('/', authMiddleware, deleteUser);
 
+/**
+ * @swagger
+ * /api/users/register-seller:
+ *   post:
+ *     summary: Register as seller with detailed store information
+ *     tags: [User]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [storeName, storeAddress, idCardNumber]
+ *             properties:
+ *               storeName: { type: string }
+ *               storeDescription: { type: string }
+ *               storeAddress: { type: string }
+ *               storePhone: { type: string }
+ *               bankName: { type: string }
+ *               bankAccountNumber: { type: string }
+ *               bankAccountName: { type: string }
+ *               idCardNumber: { type: string }
+ *               idCardImageUrl: { type: string }
+ *     responses:
+ *       201:
+ *         description: Seller registration submitted
+ *       400:
+ *         description: Missing required fields or already seller
+ *       500:
+ *         description: Failed to register
+ */
 router.post('/registerseller', authMiddleware, registerAsSeller);
 
+/**
+ * @swagger
+ * /api/users/seller-status:
+ *   get:
+ *     summary: Get seller verification status
+ *     tags: [User]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Returns isVerified and profile data
+ *       500:
+ *         description: Failed to fetch status
+ */
 router.get('/sellerstatus', authMiddleware, getSellerStatus);
 
 module.exports = router;

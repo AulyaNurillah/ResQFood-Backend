@@ -48,7 +48,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
 app.post('/api/auth/forgotpassword', passwordController.forgotPassword);
 app.post('/api/auth/resetpassword', passwordController.resetPassword);
-app.post('/api/upload/product-image', uploadController.upload, uploadController.uploadProductImage);
+app.post('/api/upload/productimage', uploadController.upload, uploadController.uploadProductImage);
 app.get('/api/admin/stats', authMiddleware, statsController.getPeriodicStats);
 
 
@@ -71,3 +71,29 @@ if (require.main === module) {
         console.log(`Swagger: http://localhost:${PORT}/api-docs`);
     });
 }
+
+/**
+ * @swagger
+ * /api/admin/stats:
+ *   get:
+ *     summary: Get periodic platform statistics (admin only)
+ *     tags: [Admin]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: period
+ *         schema: { type: string, enum: [daily, weekly, monthly] }
+ *         description: daily, weekly, or monthly
+ *       - in: query
+ *         name: startDate
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: endDate
+ *         schema: { type: string, format: date }
+ *     responses:
+ *       200:
+ *         description: Statistics summary and period breakdown
+ *       403:
+ *         description: Admin access required
+ */
+app.get('/api/admin/stats', authMiddleware, statsController.getPeriodicStats);

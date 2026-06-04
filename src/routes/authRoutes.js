@@ -56,4 +56,57 @@ router.post('/register', validateRegister, register);
  */
 router.post('/login', login);
 
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Send password reset link to email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reset link sent
+ *       400:
+ *         description: Email required
+ *       500:
+ *         description: Failed to send
+ */
+app.post('/api/auth/forgotpassword', passwordController.forgotPassword);
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Reset password using token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [access_token, new_password]
+ *             properties:
+ *               access_token:
+ *                 type: string
+ *               new_password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated
+ *       400:
+ *         description: Missing token or password
+ *       500:
+ *         description: Failed to reset
+ */
+app.post('/api/auth/resetpassword', passwordController.resetPassword);
 module.exports = router;
