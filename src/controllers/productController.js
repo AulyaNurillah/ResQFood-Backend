@@ -2,7 +2,7 @@ const supabase = require('../config/supabase');
 
 // Get all products (public) with filters
 exports.getAllProducts = async (req, res) => {
-    const { search, minPrice, maxPrice, status } = req.query;
+    const { search, minPrice, maxPrice, status, category } = req.query;
     try {
         let query = supabase
             .from('products')
@@ -14,6 +14,7 @@ exports.getAllProducts = async (req, res) => {
         if (minPrice) query = query.gte('price', parseInt(minPrice));
         if (maxPrice) query = query.lte('price', parseInt(maxPrice));
         if (status) query = query.eq('status', status);
+        if (category) query = query.eq('category', category);
         const { data, error } = await query;
         if (error) throw error;
         res.json(data);
@@ -45,7 +46,7 @@ exports.getProductById = async (req, res) => {
 
 // Create product (seller only)
 exports.createProduct = async (req, res) => {
-    const { name, description, price, stock, imageUrl, pickupStart, pickupEnd, expiredDate } = req.body;
+    const { name, description, price, stock, imageUrl, pickupStart, pickupEnd, expiredDate, category } = req.body;
     const sellerId = req.user.id;
     try {
         const { data, error } = await supabase
@@ -60,6 +61,7 @@ exports.createProduct = async (req, res) => {
                 pickup_start: pickupStart,
                 pickup_end: pickupEnd,
                 expired_date: expiredDate,
+                category: category || 'lainnya',
                 status: 'tersedia'
             }])
             .select();
