@@ -32,7 +32,7 @@ const { validateRegister } = require('../middleware/validation');
  *       201:
  *         description: User registered
  */
-router.post('/register', register);
+router.post('/register', validateRegister, register);
 
 /**
  * @swagger
@@ -55,8 +55,5 @@ router.post('/register', register);
  *         description: Login successful
  */
 router.post('/login', login);
-
-router.post('/register', validateRegister, authController.register);
-
 
 module.exports = router;

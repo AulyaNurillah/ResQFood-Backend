@@ -36,6 +36,8 @@ const notificationRoutes = require('./src/routes/notificationRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const passwordController = require('./src/controllers/passwordController');
 const uploadController = require('./src/controllers/uploadController');
+const statsController = require('./src/controllers/statsController');
+const { isAdmin } = require('./src/middleware/admin');
 
 
 app.use('/api/auth', authRoutes);
@@ -44,11 +46,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
-app.post('/api/auth/forgot-password', passwordController.forgotPassword);
-app.post('/api/auth/reset-password', passwordController.resetPassword);
+app.post('/api/auth/forgotpassword', passwordController.forgotPassword);
+app.post('/api/auth/resetpassword', passwordController.resetPassword);
 app.post('/api/upload/product-image', uploadController.upload, uploadController.uploadProductImage);
-router.post('/register-seller', authMiddleware, userController.registerAsSeller);
-router.get('/seller-status', authMiddleware, userController.getSellerStatus);
+app.get('/api/admin/stats', authMiddleware, isAdmin, statsController.getPeriodicStats);
+
+
 
 
 
