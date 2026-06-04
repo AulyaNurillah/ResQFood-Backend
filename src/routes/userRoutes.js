@@ -1,5 +1,5 @@
 const express = require('express');
-const { getProfile, updateProfile, upgradeToSeller, deleteUser } = require('../controllers/userController');
+const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus } = require('../controllers/userController');
 const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
@@ -61,7 +61,7 @@ router.put('/profile', authMiddleware, updateProfile);
  *       400:
  *         description: Already a seller
  */
-router.post('/upgrade-to-seller', authMiddleware, upgradeToSeller);
+router.post('/upgradetoseller', authMiddleware, upgradeToSeller);
 
 /**
  * @swagger
@@ -76,8 +76,8 @@ router.post('/upgrade-to-seller', authMiddleware, upgradeToSeller);
  */
 router.delete('/', authMiddleware, deleteUser);
 
-router.post('/register-seller', authMiddleware, userController.registerAsSeller);
+router.post('/registerseller', authMiddleware, userController.registerAsSeller);
 
-router.get('/seller-status', authMiddleware, userController.getSellerStatus);
+router.get('/sellerstatus', authMiddleware, userController.getSellerStatus);
 
 module.exports = router;
