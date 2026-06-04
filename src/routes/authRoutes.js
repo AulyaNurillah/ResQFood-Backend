@@ -80,7 +80,7 @@ router.post('/login', login);
  *       500:
  *         description: Failed to send
  */
-app.post('/api/auth/forgotpassword', passwordController.forgotPassword);
+router.post('/forgotpassword', passwordController.forgotPassword);
 
 /**
  * @swagger
@@ -108,5 +108,5 @@ app.post('/api/auth/forgotpassword', passwordController.forgotPassword);
  *       500:
  *         description: Failed to reset
  */
-app.post('/api/auth/resetpassword', passwordController.resetPassword);
+router.post('/resetpassword', passwordController.resetPassword);
 module.exports = router;
