@@ -1,6 +1,7 @@
 const express = require('express');
 const { register, login } = require('../controllers/authController');
 const router = express.Router();
+const { validateRegister } = require('../middleware/validation');
 
 /**
  * @swagger
@@ -54,5 +55,8 @@ router.post('/register', register);
  *         description: Login successful
  */
 router.post('/login', login);
+
+router.post('/register', validateRegister, authController.register);
+
 
 module.exports = router;

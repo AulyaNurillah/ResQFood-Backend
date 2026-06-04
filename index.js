@@ -34,6 +34,9 @@ const orderRoutes = require('./src/routes/orderRoutes');
 const chatRoutes = require('./src/routes/chatRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const passwordController = require('./src/controllers/passwordController');
+const uploadController = require('./src/controllers/uploadController');
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -41,6 +44,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
+app.post('/api/auth/forgot-password', passwordController.forgotPassword);
+app.post('/api/auth/reset-password', passwordController.resetPassword);
+app.post('/api/upload/product-image', uploadController.upload, uploadController.uploadProductImage);
+router.post('/register-seller', authMiddleware, userController.registerAsSeller);
+router.get('/seller-status', authMiddleware, userController.getSellerStatus);
+
 
 
 // Home

@@ -76,4 +76,8 @@ router.post('/upgrade-to-seller', authMiddleware, upgradeToSeller);
  */
 router.delete('/', authMiddleware, deleteUser);
 
+router.post('/register-seller', authMiddleware, userController.registerAsSeller);
+
+router.get('/seller-status', authMiddleware, userController.getSellerStatus);
+
 module.exports = router;

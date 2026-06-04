@@ -13,6 +13,7 @@
     <PackageJsonDependenciesDotenv Condition="$(PackageJsonDependenciesDotenv) == ''">^16.0.3</PackageJsonDependenciesDotenv>
     <PackageJsonDependenciesExpress Condition="$(PackageJsonDependenciesExpress) == ''">^4.18.2</PackageJsonDependenciesExpress>
     <PackageJsonDependenciesJsonwebtoken Condition="$(PackageJsonDependenciesJsonwebtoken) == ''">^9.0.0</PackageJsonDependenciesJsonwebtoken>
+    <PackageJsonDependenciesMulter Condition="$(PackageJsonDependenciesMulter) == ''">^2.1.1</PackageJsonDependenciesMulter>
     <PackageJsonDependenciesSwaggerJsdoc Condition="$(PackageJsonDependenciesSwaggerJsdoc) == ''">^6.2.8</PackageJsonDependenciesSwaggerJsdoc>
     <PackageJsonDependenciesSwaggerUiExpress Condition="$(PackageJsonDependenciesSwaggerUiExpress) == ''">^5.0.0</PackageJsonDependenciesSwaggerUiExpress>
     <PackageJsonDependenciesWs Condition="$(PackageJsonDependenciesWs) == ''">^8.21.0</PackageJsonDependenciesWs>

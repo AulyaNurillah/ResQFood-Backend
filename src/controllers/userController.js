@@ -76,3 +76,83 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ error: 'Failed to delete user' });
     }
 };
+
+exports.registerAsSeller = async (req, res) => {
+    const userId = req.user.id;
+    const {
+        storeName, storeDescription, storeAddress, storePhone,
+        bankName, bankAccountNumber, bankAccountName,
+        idCardNumber, idCardImageUrl
+    } = req.body;
+
+    if (!storeName || !storeAddress || !idCardNumber) {
+        return res.status(400).json({ error: 'Store name, address, and ID card are required' });
+    }
+
+    try {
+        // Cek apakah sudah punya profile
+        const { data: existing } = await supabase
+            .from('seller_profiles')
+            .select('id')
+            .eq('user_id', userId)
+            .single();
+        if (existing) {
+            return res.status(400).json({ error: 'Already registered as seller' });
+        }
+
+        const { data, error } = await supabase
+            .from('seller_profiles')
+            .insert([{
+                user_id: userId,
+                store_name: storeName,
+                store_description: storeDescription,
+                store_address: storeAddress,
+                store_phone: storePhone,
+                bank_name: bankName,
+                bank_account_number: bankAccountNumber,
+                bank_account_name: bankAccountName,
+                id_card_number: idCardNumber,
+                id_card_image_url: idCardImageUrl,
+                is_verified: false
+            }])
+            .select();
+
+        if (error) throw error;
+
+        // Tambah role 'penjual' ke user
+        const { data: user } = await supabase
+            .from('users')
+            .select('roles')
+            .eq('id', userId)
+            .single();
+        const newRoles = [...(user.roles || ['pembeli']), 'penjual'];
+        await supabase
+            .from('users')
+            .update({ roles: newRoles })
+            .eq('id', userId);
+
+        res.status(201).json({
+            message: 'Seller registration submitted, waiting for verification',
+            profile: data[0]
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getSellerStatus = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const { data, error } = await supabase
+            .from('seller_profiles')
+            .select('is_verified, store_name')
+            .eq('user_id', userId)
+            .single();
+        if (error && error.code !== 'PGRST116') throw error;
+        res.json({ isVerified: data?.is_verified || false, profile: data || null });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
