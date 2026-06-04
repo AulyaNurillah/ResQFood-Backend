@@ -1,6 +1,6 @@
 const express = require('express');
-const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus } = require('../controllers/userController');
 const authMiddleware = require('../middleware/auth');
+const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus } = require('../controllers/userController');
 const router = express.Router();
 
 /**
@@ -76,8 +76,8 @@ router.post('/upgradetoseller', authMiddleware, upgradeToSeller);
  */
 router.delete('/', authMiddleware, deleteUser);
 
-router.post('/registerseller', authMiddleware, userController.registerAsSeller);
+router.post('/registerseller', authMiddleware, registerAsSeller);
 
-router.get('/sellerstatus', authMiddleware, userController.getSellerStatus);
+router.get('/sellerstatus', authMiddleware, getSellerStatus);
 
 module.exports = router;
