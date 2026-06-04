@@ -37,7 +37,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const passwordController = require('./src/controllers/passwordController');
 const uploadController = require('./src/controllers/uploadController');
 const statsController = require('./src/controllers/statsController');
-const { isAdmin } = require('./src/middleware/admin');
+const authMiddleware = require('./src/middleware/auth');
 
 
 app.use('/api/auth', authRoutes);
@@ -49,7 +49,7 @@ app.use('/api/users', userRoutes);
 app.post('/api/auth/forgotpassword', passwordController.forgotPassword);
 app.post('/api/auth/resetpassword', passwordController.resetPassword);
 app.post('/api/upload/product-image', uploadController.upload, uploadController.uploadProductImage);
-app.get('/api/admin/stats', authMiddleware, isAdmin, statsController.getPeriodicStats);
+app.get('/api/admin/stats', authMiddleware, statsController.getPeriodicStats);
 
 
 
