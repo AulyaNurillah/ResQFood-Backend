@@ -127,7 +127,7 @@ router.get('/sellerstatus', authMiddleware, getSellerStatus);
 
 /**
  * @swagger
- * /api/users/buyer-stats:
+ * /api/users/buyerstats:
  *   get:
  *     summary: Get statistics for the logged-in buyer (orders, spending, etc.)
  *     tags: [User]
@@ -140,7 +140,7 @@ router.get('/buyerstats', authMiddleware, getBuyerStats);
 
 /**
  * @swagger
- * /api/users/seller-stats:
+ * /api/users/sellerstats:
  *   get:
  *     summary: Get statistics for the logged-in seller (products, revenue, rating)
  *     tags: [User]
