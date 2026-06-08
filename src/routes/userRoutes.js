@@ -129,7 +129,7 @@ router.get('/sellerstatus', authMiddleware, getSellerStatus);
 
 /**
  * @swagger
- * /api/users/profile-picture:
+ * /api/users/profilepicture:
  *   post:
  *     summary: Upload profile picture (avatar)
  *     tags: [User]
@@ -159,6 +159,6 @@ router.get('/sellerstatus', authMiddleware, getSellerStatus);
  *       500:
  *         description: Upload failed
  */
-router.post('/profile-picture', authMiddleware, upload.single('avatar'), userController.uploadProfilePicture);
+router.post('/profilepicture', authMiddleware, upload.single('avatar'), userController.uploadProfilePicture);
 
 module.exports = router;
