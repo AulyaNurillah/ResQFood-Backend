@@ -228,3 +228,47 @@ exports.getSellerStats = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.getMyStats = async (req, res) => {
+    const userId = req.user.id;
+    const roles = req.user.roles;
+    try {
+        if (roles.includes('pembeli')) {
+            // statistik pembeli
+            const { data: orders } = await supabase
+                .from('orders')
+                .select('total_price, status')
+                .eq('buyer_id', userId);
+            const totalSpent = orders.filter(o => o.status === 'selesai').reduce((sum, o) => sum + (o.total_price || 0), 0);
+            const totalOrders = orders.length;
+            const { count: ratingsGiven } = await supabase
+                .from('seller_ratings')
+                .select('id', { count: 'exact', head: true })
+                .eq('buyer_id', userId);
+            return res.json({ role: 'pembeli', totalOrders, totalSpent, ratingsGiven });
+        } else if (roles.includes('penjual')) {
+            // statistik penjual
+            const { data: products } = await supabase
+                .from('products')
+                .select('id')
+                .eq('seller_id', userId);
+            const totalProducts = products.length;
+            const { data: orders } = await supabase
+                .from('orders')
+                .select('total_price, status')
+                .eq('seller_id', userId);
+            const totalSales = orders.filter(o => o.status === 'selesai').reduce((sum, o) => sum + (o.total_price || 0), 0);
+            const totalOrders = orders.length;
+            const { data: ratings } = await supabase
+                .from('seller_ratings')
+                .select('rating')
+                .eq('seller_id', userId);
+            const avgRating = ratings.length > 0 ? ratings.reduce((s, r) => s + r.rating, 0) / ratings.length : 0;
+            return res.json({ role: 'penjual', totalProducts, totalOrders, totalSales, averageRating: avgRating.toFixed(1) });
+        }
+        res.status(403).json({ error: 'Unknown role' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
