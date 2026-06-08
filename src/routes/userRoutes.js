@@ -1,7 +1,9 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
-const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus, getBuyerStats, getSellerStats } = require('../controllers/userController');
+const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus } = require('../controllers/userController');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * @swagger
@@ -127,30 +129,36 @@ router.get('/sellerstatus', authMiddleware, getSellerStatus);
 
 /**
  * @swagger
- * /api/users/buyerstats:
- *   get:
- *     summary: Get statistics for the logged-in buyer (orders, spending, etc.)
+ * /api/users/profile-picture:
+ *   post:
+ *     summary: Upload profile picture (avatar)
  *     tags: [User]
  *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
- *         description: Buyer statistics
+ *         description: Profile picture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 avatarUrl: { type: string }
+ *       400:
+ *         description: No file uploaded
+ *       500:
+ *         description: Upload failed
  */
-router.get('/buyerstats', authMiddleware, getBuyerStats);
-
-/**
- * @swagger
- * /api/users/sellerstats:
- *   get:
- *     summary: Get statistics for the logged-in seller (products, revenue, rating)
- *     tags: [User]
- *     security: [{ bearerAuth: [] }]
- *     responses:
- *       200:
- *         description: Seller statistics
- *       403:
- *         description: User is not a seller
- */
-router.get('/sellerstats', authMiddleware, getSellerStats);
+router.post('/profile-picture', authMiddleware, upload.single('avatar'), userController.uploadProfilePicture);
 
 module.exports = router;

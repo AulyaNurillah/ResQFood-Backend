@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
-const { getBuyerStats, getSellerStats } = require('../controllers/statsController');
+const { getBuyerStats, getSellerStats } = require('../controllers/userController');
 const router = express.Router();
 
 /**
@@ -19,7 +19,7 @@ const router = express.Router();
  *     security: [{ bearerAuth: [] }]
  *     responses:
  *       200:
- *         description: Buyer stats (total orders, spent, etc.)
+ *         description: Buyer statistics
  */
 router.get('/buyer', authMiddleware, getBuyerStats);
 
@@ -32,7 +32,9 @@ router.get('/buyer', authMiddleware, getBuyerStats);
  *     security: [{ bearerAuth: [] }]
  *     responses:
  *       200:
- *         description: Seller stats (items sold, revenue, rating, etc.)
+ *         description: Seller statistics
+ *       403:
+ *         description: Not a seller
  */
 router.get('/seller', authMiddleware, getSellerStats);
 

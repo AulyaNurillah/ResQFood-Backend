@@ -1,4 +1,6 @@
 const supabase = require('../config/supabase');
+const path = require('path');
+
 
 // Get profile
 exports.getProfile = async (req, res) => {
@@ -288,6 +290,43 @@ exports.getMyStats = async (req, res) => {
             return res.json({ role: 'penjual', totalProducts, totalOrders, totalSales, averageRating: avgRating.toFixed(1) });
         }
         res.status(403).json({ error: 'Unknown role' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Upload profile picture (avatar)
+exports.uploadProfilePicture = async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const userId = req.user.id;
+    const file = req.file;
+    const fileName = `avatars/${userId}-${Date.now()}${path.extname(file.originalname)}`;
+    const filePath = fileName;
+
+    try {
+        const { data, error } = await supabase.storage
+            .from('avatars') // pastikan bucket 'avatars' sudah dibuat di Supabase Storage (public)
+            .upload(filePath, file.buffer, {
+                contentType: file.mimetype,
+                cacheControl: '3600',
+                upsert: true,
+            });
+        if (error) throw error;
+
+        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+        const avatarUrl = urlData.publicUrl;
+
+        // Update user profile with avatar_url
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ avatar_url: avatarUrl })
+            .eq('id', userId);
+        if (updateError) throw updateError;
+
+        res.json({ message: 'Profile picture updated', avatarUrl });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });

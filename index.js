@@ -40,6 +40,7 @@ const statsController = require('./src/controllers/statsController');
 const authMiddleware = require('./src/middleware/auth');
 const statsRoutes = require('./src/routes/statsRoutes');
 const ratingRoutes = require('./src/routes/ratingRoutes');
+const sellerRoutes = require('./src/routes/sellerRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -53,6 +54,7 @@ app.post('/api/upload/productimage', uploadController.upload, uploadController.u
 app.get('/api/admin/stats', authMiddleware, statsController.getPeriodicStats);
 app.use('/api/stats', statsRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/sellers', sellerRoutes);
 
 
 // Home
