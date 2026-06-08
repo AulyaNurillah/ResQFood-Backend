@@ -21,9 +21,13 @@ const router = express.Router();
  * @swagger
  * /api/products:
  *   get:
- *     summary: Get all products (public)
+ *     summary: Get all products with filters
  *     tags: [Products]
  *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema: { type: string }
+ *         description: Filter by category (e.g., Makanan, Minuman)
  *       - in: query
  *         name: search
  *         schema: { type: string }
@@ -31,12 +35,15 @@ const router = express.Router();
  *       - in: query
  *         name: minPrice
  *         schema: { type: integer }
+ *         description: Minimum price
  *       - in: query
  *         name: maxPrice
  *         schema: { type: integer }
+ *         description: Maximum price
  *       - in: query
  *         name: status
  *         schema: { type: string }
+ *         description: Product status (tersedia, tidak_tersedia)
  *     responses:
  *       200:
  *         description: List of products

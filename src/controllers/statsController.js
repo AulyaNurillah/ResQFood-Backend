@@ -4,24 +4,22 @@ exports.getPeriodicStats = async (req, res) => {
     const { period = 'monthly', startDate, endDate } = req.query;
 
     try {
-        // Statistik user
+        // Total users
         const { count: totalUsers } = await supabase
             .from('users')
             .select('*', { count: 'exact', head: true });
 
-        // Statistik produk
+        // Total products
         const { count: totalProducts } = await supabase
             .from('products')
             .select('*', { count: 'exact', head: true });
 
-        // Ambil order dalam periode
+        // Orders dalam periode
         let query = supabase
             .from('orders')
             .select('created_at, total_price, status');
-
         if (startDate) query = query.gte('created_at', startDate);
         if (endDate) query = query.lte('created_at', endDate);
-
         const { data: orders, error } = await query;
         if (error) throw error;
 

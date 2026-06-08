@@ -156,3 +156,75 @@ exports.getSellerStatus = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+// Statistik untuk pembeli
+exports.getBuyerStats = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        // Ambil semua order pembeli
+        const { data: orders, error } = await supabase
+            .from('orders')
+            .select('status, total_price')
+            .eq('buyer_id', userId);
+        if (error) throw error;
+
+        const totalOrders = orders.length;
+        const completedOrders = orders.filter(o => o.status === 'selesai').length;
+        const totalSpent = orders
+            .filter(o => o.status === 'selesai')
+            .reduce((sum, o) => sum + (o.total_price || 0), 0);
+        const avgOrder = totalSpent / (completedOrders || 1);
+
+        res.json({
+            totalOrders,
+            completedOrders,
+            totalSpent,
+            averageOrderValue: avgOrder,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Statistik untuk penjual
+exports.getSellerStats = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        // Produk yang dijual oleh penjual ini
+        const { data: products, error: prodErr } = await supabase
+            .from('products')
+            .select('id, name, stock')
+            .eq('seller_id', userId);
+        if (prodErr) throw prodErr;
+
+        // Order yang masuk ke penjual ini
+        const { data: orders, error: orderErr } = await supabase
+            .from('orders')
+            .select('status, total_price, quantity, product_id')
+            .eq('seller_id', userId);
+        if (orderErr) throw orderErr;
+
+        const totalProducts = products.length;
+        const totalOrders = orders.length;
+        const completedOrders = orders.filter(o => o.status === 'selesai').length;
+        const totalRevenue = orders
+            .filter(o => o.status === 'selesai')
+            .reduce((sum, o) => sum + (o.total_price || 0), 0);
+        // Total unit terjual (quantity dari order selesai)
+        const totalUnitsSold = orders
+            .filter(o => o.status === 'selesai')
+            .reduce((sum, o) => sum + (o.quantity || 0), 0);
+
+        res.json({
+            totalProducts,
+            totalOrders,
+            completedOrders,
+            totalRevenue,
+            totalUnitsSold,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};

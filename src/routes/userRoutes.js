@@ -125,4 +125,30 @@ router.post('/registerseller', authMiddleware, registerAsSeller);
  */
 router.get('/sellerstatus', authMiddleware, getSellerStatus);
 
+/**
+ * @swagger
+ * /api/users/buyer-stats:
+ *   get:
+ *     summary: Get statistics for buyer (total orders, spent, etc.)
+ *     tags: [User]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Buyer statistics
+ */
+router.get('/buyerstats', authMiddleware, userController.getBuyerStats);
+
+/**
+ * @swagger
+ * /api/users/seller-stats:
+ *   get:
+ *     summary: Get statistics for seller (products sold, revenue, etc.)
+ *     tags: [User]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Seller statistics
+ */
+router.get('/sellerstats', authMiddleware, userController.getSellerStats);
+
 module.exports = router;
