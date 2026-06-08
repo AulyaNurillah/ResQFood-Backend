@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
-const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus } = require('../controllers/userController');
+const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus, getBuyerStats, getSellerStats } = require('../controllers/userController');
 const router = express.Router();
 
 /**
@@ -129,26 +129,28 @@ router.get('/sellerstatus', authMiddleware, getSellerStatus);
  * @swagger
  * /api/users/buyer-stats:
  *   get:
- *     summary: Get statistics for buyer (total orders, spent, etc.)
+ *     summary: Get statistics for the logged-in buyer (orders, spending, etc.)
  *     tags: [User]
  *     security: [{ bearerAuth: [] }]
  *     responses:
  *       200:
  *         description: Buyer statistics
  */
-router.get('/buyerstats', authMiddleware, userController.getBuyerStats);
+router.get('/buyerstats', authMiddleware, getBuyerStats);
 
 /**
  * @swagger
  * /api/users/seller-stats:
  *   get:
- *     summary: Get statistics for seller (products sold, revenue, etc.)
+ *     summary: Get statistics for the logged-in seller (products, revenue, rating)
  *     tags: [User]
  *     security: [{ bearerAuth: [] }]
  *     responses:
  *       200:
  *         description: Seller statistics
+ *       403:
+ *         description: User is not a seller
  */
-router.get('/sellerstats', authMiddleware, userController.getSellerStats);
+router.get('/sellerstats', authMiddleware, getSellerStats);
 
 module.exports = router;

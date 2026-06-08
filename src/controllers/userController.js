@@ -157,29 +157,35 @@ exports.getSellerStatus = async (req, res) => {
     }
 };
 
-// Statistik untuk pembeli
+// Statistik untuk pembeli (riwayat order, total belanja, dll)
 exports.getBuyerStats = async (req, res) => {
     const userId = req.user.id;
     try {
-        // Ambil semua order pembeli
-        const { data: orders, error } = await supabase
+        // Total order yang dibuat pembeli
+        const { data: orders, error: orderErr } = await supabase
             .from('orders')
-            .select('status, total_price')
+            .select('id, total_price, status, created_at')
             .eq('buyer_id', userId);
-        if (error) throw error;
+        if (orderErr) throw orderErr;
 
         const totalOrders = orders.length;
-        const completedOrders = orders.filter(o => o.status === 'selesai').length;
-        const totalSpent = orders
-            .filter(o => o.status === 'selesai')
-            .reduce((sum, o) => sum + (o.total_price || 0), 0);
-        const avgOrder = totalSpent / (completedOrders || 1);
+        const completedOrders = orders.filter(o => o.status === 'selesai');
+        const totalSpent = completedOrders.reduce((sum, o) => sum + (o.total_price || 0), 0);
+        const pendingOrders = orders.filter(o => o.status === 'menunggu_konfirmasi_penjual').length;
+
+        // Jumlah produk unik yang pernah dibeli
+        const { data: products, error: prodErr } = await supabase
+            .from('orders')
+            .select('product_id')
+            .eq('buyer_id', userId);
+        const uniqueProducts = new Set(products.map(p => p.product_id)).size;
 
         res.json({
             totalOrders,
-            completedOrders,
+            completedOrders: completedOrders.length,
             totalSpent,
-            averageOrderValue: avgOrder,
+            pendingOrders,
+            uniqueProductsPurchased: uniqueProducts
         });
     } catch (err) {
         console.error(err);
@@ -187,41 +193,56 @@ exports.getBuyerStats = async (req, res) => {
     }
 };
 
-// Statistik untuk penjual
+// Statistik untuk penjual (kinerja toko)
 exports.getSellerStats = async (req, res) => {
     const userId = req.user.id;
     try {
-        // Produk yang dijual oleh penjual ini
-        const { data: products, error: prodErr } = await supabase
+        // Cek apakah user benar penjual
+        const { data: sellerProfile } = await supabase
+            .from('seller_profiles')
+            .select('id')
+            .eq('user_id', userId)
+            .single();
+        if (!sellerProfile) {
+            return res.status(403).json({ error: 'Anda bukan penjual' });
+        }
+
+        // Total produk yang dijual
+        const { count: totalProducts, error: prodErr } = await supabase
             .from('products')
-            .select('id, name, stock')
+            .select('*', { count: 'exact', head: true })
             .eq('seller_id', userId);
         if (prodErr) throw prodErr;
 
-        // Order yang masuk ke penjual ini
+        // Order yang masuk ke toko
         const { data: orders, error: orderErr } = await supabase
             .from('orders')
-            .select('status, total_price, quantity, product_id')
+            .select('id, total_price, status, created_at')
             .eq('seller_id', userId);
         if (orderErr) throw orderErr;
 
-        const totalProducts = products.length;
         const totalOrders = orders.length;
-        const completedOrders = orders.filter(o => o.status === 'selesai').length;
-        const totalRevenue = orders
-            .filter(o => o.status === 'selesai')
-            .reduce((sum, o) => sum + (o.total_price || 0), 0);
-        // Total unit terjual (quantity dari order selesai)
-        const totalUnitsSold = orders
-            .filter(o => o.status === 'selesai')
-            .reduce((sum, o) => sum + (o.quantity || 0), 0);
+        const completedOrders = orders.filter(o => o.status === 'selesai');
+        const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.total_price || 0), 0);
+        const pendingConfirm = orders.filter(o => o.status === 'menunggu_konfirmasi_penjual').length;
+
+        // Rata-rata rating (nanti dari tabel ratings)
+        const { data: ratings, error: ratingErr } = await supabase
+            .from('ratings')
+            .select('rating')
+            .eq('seller_id', userId);
+        let averageRating = 0;
+        if (ratings && ratings.length > 0) {
+            averageRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+        }
 
         res.json({
             totalProducts,
             totalOrders,
-            completedOrders,
+            completedOrders: completedOrders.length,
             totalRevenue,
-            totalUnitsSold,
+            pendingConfirmations: pendingConfirm,
+            averageRating
         });
     } catch (err) {
         console.error(err);

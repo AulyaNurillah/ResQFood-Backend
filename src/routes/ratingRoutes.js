@@ -7,14 +7,14 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Ratings
- *   description: Rate seller service
+ *   description: Rating and review for sellers
  */
 
 /**
  * @swagger
  * /api/ratings:
  *   post:
- *     summary: Rate seller for a completed order
+ *     summary: Submit rating for a completed order
  *     tags: [Ratings]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -27,18 +27,18 @@ const router = express.Router();
  *             properties:
  *               orderId: { type: string }
  *               rating: { type: integer, minimum: 1, maximum: 5 }
- *               comment: { type: string }
+ *               review: { type: string }
  *     responses:
  *       201:
  *         description: Rating submitted
  */
-router.post('/', authMiddleware, ratingController.rateSeller);
+router.post('/', authMiddleware, ratingController.createRating);
 
 /**
  * @swagger
  * /api/ratings/seller/{sellerId}:
  *   get:
- *     summary: Get all ratings for a seller (public)
+ *     summary: Get all ratings and average for a seller
  *     tags: [Ratings]
  *     parameters:
  *       - in: path
