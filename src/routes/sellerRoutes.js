@@ -4,32 +4,28 @@ const router = express.Router();
 
 /**
  * @swagger
- * tags:
- *   name: Sellers
- *   description: Seller information and location
- */
-
-/**
- * @swagger
  * /api/sellers/nearby:
  *   get:
- *     summary: Get sellers near a location (by lat/lng)
+ *     summary: Get sellers near a location
  *     tags: [Sellers]
  *     parameters:
  *       - in: query
  *         name: lat
  *         required: true
  *         schema: { type: number }
+ *         description: Latitude
  *       - in: query
  *         name: lng
  *         required: true
  *         schema: { type: number }
+ *         description: Longitude
  *       - in: query
  *         name: radius
- *         schema: { type: integer, default: 10 }
+ *         schema: { type: number, default: 10 }
+ *         description: Radius in km
  *     responses:
  *       200:
- *         description: List of sellers with distance
+ *         description: List of nearby sellers with distance
  */
 router.get('/nearby', sellerController.getNearbySellers);
 
@@ -37,7 +33,7 @@ router.get('/nearby', sellerController.getNearbySellers);
  * @swagger
  * /api/sellers/{sellerId}:
  *   get:
- *     summary: Get detailed seller profile by seller_profile id
+ *     summary: Get detailed seller profile
  *     tags: [Sellers]
  *     parameters:
  *       - in: path
@@ -46,7 +42,7 @@ router.get('/nearby', sellerController.getNearbySellers);
  *         schema: { type: string }
  *     responses:
  *       200:
- *         description: Seller details
+ *         description: Seller details including average rating
  */
 router.get('/:sellerId', sellerController.getSellerDetail);
 
