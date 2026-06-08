@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
-const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus } = require('../controllers/userController');
+const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus, uploadProfilePicture } = require('../controllers/userController');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
@@ -159,6 +159,6 @@ router.get('/sellerstatus', authMiddleware, getSellerStatus);
  *       500:
  *         description: Upload failed
  */
-router.post('/profilepicture', authMiddleware, upload.single('avatar'), userController.uploadProfilePicture);
+router.post('/profilepicture', authMiddleware, upload.single('avatar'), uploadProfilePicture);
 
 module.exports = router;
