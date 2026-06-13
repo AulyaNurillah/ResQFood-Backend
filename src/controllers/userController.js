@@ -38,55 +38,6 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// Upgrade to seller
-exports.upgradeToSeller = async (req, res) => {
-    const userId = req.user.id;
-    try {
-        // Ambil user saat ini
-        const { data: user, error: fetchError } = await supabase
-            .from('users')
-            .select('id, email, roles')
-            .eq('id', userId)
-            .single();
-
-        if (fetchError || !user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        let roles = user.roles || ['pembeli'];
-        if (roles.includes('penjual')) {
-            return res.status(400).json({ error: 'Already a seller' });
-        }
-
-        roles.push('penjual');
-
-        // Update role di database
-        const { data: updatedUser, error: updateError } = await supabase
-            .from('users')
-            .update({ roles })
-            .eq('id', userId)
-            .select();
-
-        if (updateError) throw updateError;
-
-        // Generate token baru dengan role terbaru
-        const newToken = jwt.sign(
-            { id: updatedUser[0].id, email: updatedUser[0].email, roles: updatedUser[0].roles },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        // Kirim response berisi user dan token baru
-        res.json({
-            ...updatedUser[0],
-            token: newToken
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-};
-
 // Soft delete user (set is_deleted = true) – but we need to add column first
 // I'll add is_deleted column handling. If column doesn't exist, we can ignore or add.
 exports.deleteUser = async (req, res) => {
@@ -108,9 +59,9 @@ exports.deleteUser = async (req, res) => {
 exports.registerAsSeller = async (req, res) => {
     const userId = req.user.id;
     const {
-        storeName, storeDescription, storeAddress, storePhone,
-        bankName, bankAccountNumber, bankAccountName,
-        idCardNumber, idCardImageUrl
+        storeName, storeDescription, storeAddress,
+        storePhone, bankName, bankAccountNumber,
+        bankAccountName, idCardNumber, idCardImageUrl
     } = req.body;
 
     if (!storeName || !storeAddress || !idCardNumber) {
@@ -118,16 +69,18 @@ exports.registerAsSeller = async (req, res) => {
     }
 
     try {
-        // Cek apakah sudah punya profile
+        // Cek apakah sudah punya seller profile
         const { data: existing } = await supabase
             .from('seller_profiles')
             .select('id')
             .eq('user_id', userId)
             .single();
+
         if (existing) {
             return res.status(400).json({ error: 'Already registered as seller' });
         }
 
+        // Insert seller profile
         const { data, error } = await supabase
             .from('seller_profiles')
             .insert([{
@@ -147,21 +100,33 @@ exports.registerAsSeller = async (req, res) => {
 
         if (error) throw error;
 
-        // Tambah role 'penjual' ke user
+        // Ambil user dan update role
         const { data: user } = await supabase
             .from('users')
             .select('roles')
             .eq('id', userId)
             .single();
-        const newRoles = [...(user.roles || ['pembeli']), 'penjual'];
-        await supabase
-            .from('users')
-            .update({ roles: newRoles })
-            .eq('id', userId);
+
+        let roles = user.roles || ['pembeli'];
+        if (!roles.includes('penjual')) {
+            roles.push('penjual');
+            await supabase
+                .from('users')
+                .update({ roles })
+                .eq('id', userId);
+        }
+
+        // Generate token baru dengan role terbaru
+        const newToken = jwt.sign(
+            { id: userId, email: req.user.email, roles: roles },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
 
         res.status(201).json({
-            message: 'Seller registration submitted, waiting for verification',
-            profile: data[0]
+            message: 'Seller registration successful. You are now a seller.',
+            profile: data[0],
+            token: newToken
         });
     } catch (err) {
         console.error(err);

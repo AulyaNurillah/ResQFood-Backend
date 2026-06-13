@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
-const { getProfile, updateProfile, upgradeToSeller, deleteUser, registerAsSeller, getSellerStatus, uploadProfilePicture } = require('../controllers/userController');
+const { getProfile, updateProfile, deleteUser, registerAsSeller, getSellerStatus, uploadProfilePicture } = require('../controllers/userController');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
@@ -49,21 +49,6 @@ router.get('/profile', authMiddleware, getProfile);
  *         description: Profile updated
  */
 router.put('/profile', authMiddleware, updateProfile);
-
-/**
- * @swagger
- * /api/users/upgradetoseller:
- *   post:
- *     summary: Upgrade current user to seller role
- *     tags: [User]
- *     security: [{ bearerAuth: [] }]
- *     responses:
- *       200:
- *         description: User upgraded to seller
- *       400:
- *         description: Already a seller
- */
-router.post('/upgradetoseller', authMiddleware, upgradeToSeller);
 
 /**
  * @swagger
