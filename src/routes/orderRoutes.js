@@ -96,7 +96,7 @@ router.post('/scan', authMiddleware, scanQr);
  *       200:
  *         description: List of orders made by buyer
  */
-router.get('/my-orders', authMiddleware, getMyOrders);
+router.get('/myorders', authMiddleware, getMyOrders);
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ router.get('/my-orders', authMiddleware, getMyOrders);
  *       200:
  *         description: List of orders for seller
  */
-router.get('/my-sales', authMiddleware, getMySales);
+router.get('/mysales', authMiddleware, getMySales);
 
 /**
  * @swagger
