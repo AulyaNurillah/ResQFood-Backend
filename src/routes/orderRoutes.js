@@ -48,15 +48,17 @@ router.post('/', authMiddleware, createOrder);
  *     summary: Accept an order (seller) and generate QR token
  *     tags: [Orders]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *         description: Order ID
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         application/json:
- *           schema:
- *             type: object
- *             required: [orderId]
- *             properties:
- *               orderId: { type: string }
+ *           schema: {}
  *     responses:
  *       200:
  *         description: Order accepted, QR token generated
