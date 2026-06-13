@@ -1,5 +1,6 @@
 const supabase = require('../config/supabase');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 
 // Get profile
@@ -41,23 +42,48 @@ exports.updateProfile = async (req, res) => {
 exports.upgradeToSeller = async (req, res) => {
     const userId = req.user.id;
     try {
-        const { data: user } = await supabase.from('users').select('roles').eq('id', userId).single();
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        // Ambil user saat ini
+        const { data: user, error: fetchError } = await supabase
+            .from('users')
+            .select('id, email, roles')
+            .eq('id', userId)
+            .single();
+
+        if (fetchError || !user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         let roles = user.roles || ['pembeli'];
         if (roles.includes('penjual')) {
             return res.status(400).json({ error: 'Already a seller' });
         }
+
         roles.push('penjual');
-        const { data, error } = await supabase
+
+        // Update role di database
+        const { data: updatedUser, error: updateError } = await supabase
             .from('users')
             .update({ roles })
             .eq('id', userId)
             .select();
-        if (error) throw error;
-        res.json(data[0]);
+
+        if (updateError) throw updateError;
+
+        // Generate token baru dengan role terbaru
+        const newToken = jwt.sign(
+            { id: updatedUser[0].id, email: updatedUser[0].email, roles: updatedUser[0].roles },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        // Kirim response berisi user dan token baru
+        res.json({
+            ...updatedUser[0],
+            token: newToken
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to upgrade' });
+        res.status(500).json({ error: err.message });
     }
 };
 
