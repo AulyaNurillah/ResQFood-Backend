@@ -2,6 +2,7 @@ const express = require('express');
 const { register, login } = require('../controllers/authController');
 const passwordController = require('../controllers/passwordController');
 const { validateRegister } = require('../middleware/validation');
+const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
 /**
