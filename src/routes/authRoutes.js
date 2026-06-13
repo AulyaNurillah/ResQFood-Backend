@@ -110,4 +110,5 @@ router.post('/forgotpassword', passwordController.forgotPassword);
  *         description: Failed to reset
  */
 router.post('/resetpassword', passwordController.resetPassword);
+router.post('/refresh-token', authMiddleware, refreshToken);
 module.exports = router;

@@ -59,3 +59,30 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+exports.refreshToken = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('id, email, roles')
+            .eq('id', userId)
+            .single();
+
+        if (error || !user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const newToken = jwt.sign(
+            { id: user.id, email: user.email, roles: user.roles },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({ token: newToken });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};

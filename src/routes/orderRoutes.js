@@ -39,7 +39,7 @@ const router = express.Router();
  *       201:
  *         description: Order created
  */
-router.post('/', authMiddleware, acceptOrder);
+router.post('/', authMiddleware, createOrder);
 
 /**
  * @swagger
