@@ -35,49 +35,36 @@ exports.createOrder = async (req, res) => {
 
 // Accept order (seller) -> generate QR token
 exports.acceptOrder = async (req, res) => {
-    const { id } = req.params;           // 📌 Ambil orderId dari URL, bukan dari body
+    const { id } = req.params; // ambil dari path parameter
     const sellerId = req.user.id;
 
     try {
-        // Ambil data order beserta relasi produknya
-        const { data: order, error: fetchErr } = await supabase
+        const { data: order, error } = await supabase
             .from('orders')
             .select('*, product:products(*)')
             .eq('id', id)
             .single();
 
-        if (fetchErr || !order) {
+        if (error || !order) {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Validasi apakah penjual yang login adalah pemilik produk
         if (order.seller_id !== sellerId) {
-            return res.status(403).json({ error: 'You are not the seller of this order' });
+            return res.status(403).json({ error: 'Not your order' });
         }
 
-        // Validasi status order (harus 'menunggu_konfirmasi_penjual')
         if (order.status !== 'menunggu_konfirmasi_penjual') {
             return res.status(400).json({ error: 'Order cannot be accepted' });
         }
 
-        // Generate QR token
         const qrToken = `${order.id}-${Date.now()}`;
-
-        // Update status order dan simpan QR token
-        const { data, error: updateErr } = await supabase
+        const { data, updateErr } = await supabase
             .from('orders')
             .update({ status: 'diterima_penjual', qr_token: qrToken, updated_at: new Date() })
             .eq('id', id)
             .select();
 
         if (updateErr) throw updateErr;
-
-        // 📬 Kirim notifikasi ke pembeli
-        await supabase.from('notifications').insert([{
-            user_id: order.buyer_id,
-            title: 'Pesanan Diterima',
-            body: `Pesanan untuk ${order.product.name} telah diterima penjual. Silakan lakukan pickup.`
-        }]);
 
         res.json(data[0]);
     } catch (err) {
