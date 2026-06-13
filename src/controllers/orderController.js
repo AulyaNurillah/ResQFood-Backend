@@ -130,14 +130,20 @@ exports.getMyOrders = async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('orders')
-            .select('*, product:products(name), seller:users(full_name)')
+            .select(`
+        *,
+        product:products(*),
+        seller:users!seller_id(*)
+      `)
             .eq('buyer_id', buyerId)
             .order('created_at', { ascending: false });
+
         if (error) throw error;
+        // Selalu kembalikan array, meskipun kosong
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to fetch orders' });
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -147,14 +153,19 @@ exports.getMySales = async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('orders')
-            .select('*, product:products(name), buyer:users(full_name)')
+            .select(`
+        *,
+        product:products(*),
+        buyer:users!buyer_id(*)
+      `)
             .eq('seller_id', sellerId)
             .order('created_at', { ascending: false });
+
         if (error) throw error;
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to fetch sales' });
+        res.status(500).json({ error: err.message });
     }
 };
 
