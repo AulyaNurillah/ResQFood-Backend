@@ -185,19 +185,26 @@ exports.getOrderById = async (req, res) => {
             .from('orders')
             .select(`
         *,
-        product:products(name, price, image_url),
-        seller:users(id, full_name, phone, address, latitude, longitude),
-        buyer:users(id, full_name, phone)
+        product:products(*),
+        seller:users!seller_id(id, full_name, email, phone, address, latitude, longitude),
+        buyer:users!buyer_id(id, full_name, email, phone)
       `)
             .eq('id', id)
             .single();
-        if (error || !data) return res.status(404).json({ error: 'Order not found' });
+
+        if (error || !data) {
+            console.error('Order not found:', error);
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Cek akses: hanya buyer atau seller yang bisa lihat detail
         if (data.buyer_id !== userId && data.seller_id !== userId) {
             return res.status(403).json({ error: 'Access denied' });
         }
+
         res.json(data);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to fetch order' });
+        res.status(500).json({ error: err.message });
     }
 };
