@@ -28,7 +28,7 @@ exports.uploadProductImage = async (req, res) => {
 
     try {
         const { data, error } = await supabase.storage
-            .from('product-images')
+            .from('product_images')
             .upload(filePath, file.buffer, {
                 contentType: file.mimetype,
                 cacheControl: '3600',
@@ -37,7 +37,7 @@ exports.uploadProductImage = async (req, res) => {
         if (error) throw error;
 
         const { data: urlData } = supabase.storage
-            .from('product-images')
+            .from('product_images')
             .getPublicUrl(filePath);
 
         res.json({

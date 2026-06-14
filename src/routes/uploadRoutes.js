@@ -23,4 +23,4 @@
  *       500:
  *         description: Upload failed
  */
-app.post('/api/upload/product-image', uploadController.upload, uploadController.uploadProductImage);
+app.post('/api/upload/productimage', uploadController.upload, uploadController.uploadProductImage);
