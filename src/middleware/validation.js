@@ -1,16 +1,12 @@
 const { body, validationResult } = require('express-validator');
 
-const { body, validationResult } = require('express-validator');
-
 exports.validateRegister = [
     body('email').isEmail().normalizeEmail().withMessage('Email tidak valid'),
     body('fullName').notEmpty().withMessage('Nama lengkap wajib diisi'),
     body('phone')
         .optional()
         .custom(value => {
-            // Hapus semua karakter non-digit
             const digits = value.replace(/\D/g, '');
-            // Cek panjang antara 10 dan 13 digit
             if (digits.length < 10 || digits.length > 13) {
                 throw new Error('Nomor HP harus 10-13 digit');
             }
