@@ -78,25 +78,62 @@ exports.scanQr = async (req, res) => {
     const { qrToken } = req.body;
     const sellerId = req.user.id;
     try {
-        const { data: order, error } = await supabase
+        // 1. Coba cari order berdasarkan qr_token
+        let { data: order, error } = await supabase
             .from('orders')
             .select('*, product:products(*)')
             .eq('qr_token', qrToken)
             .single();
-        if (error || !order) return res.status(404).json({ error: 'Invalid QR token' });
-        if (order.seller_id !== sellerId) return res.status(403).json({ error: 'Not your order' });
-        if (order.status !== 'diterima_penjual') return res.status(400).json({ error: 'Order cannot be completed' });
+
+        // 2. Jika tidak ditemukan, coba parse qrToken sebagai JSON atau UUID
+        if (error || !order) {
+            let orderId = null;
+            try {
+                const parsed = JSON.parse(qrToken);
+                orderId = parsed.order_id || parsed.orderId || parsed.id;
+            } catch (e) {
+                // bukan JSON, cek apakah qrToken berupa UUID (order_id)
+                if (qrToken.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+                    orderId = qrToken;
+                }
+            }
+            if (orderId) {
+                const { data, error: err } = await supabase
+                    .from('orders')
+                    .select('*, product:products(*)')
+                    .eq('id', orderId)
+                    .single();
+                order = data;
+                error = err;
+            }
+        }
+
+        if (error || !order) {
+            return res.status(404).json({ error: 'Invalid QR token or order ID' });
+        }
+
+        if (order.seller_id !== sellerId) {
+            return res.status(403).json({ error: 'Not your order' });
+        }
+
+        if (order.status !== 'diterima_penjual') {
+            return res.status(400).json({ error: 'Order cannot be completed' });
+        }
+
         const { data, updErr } = await supabase
             .from('orders')
             .update({ status: 'selesai', updated_at: new Date() })
             .eq('id', order.id)
             .select();
+
         if (updErr) throw updErr;
-        // Notifications for both
+
+        // Notifikasi untuk buyer & seller
         await supabase.from('notifications').insert([
             { user_id: order.buyer_id, title: 'Pesanan Selesai', body: `Pesanan untuk ${order.product.name} telah selesai. Terima kasih!` },
             { user_id: order.seller_id, title: 'Pesanan Selesai', body: `Pesanan untuk ${order.product.name} telah selesai. Terima kasih telah berkontribusi!` }
         ]);
+
         res.json(data[0]);
     } catch (err) {
         console.error(err);
